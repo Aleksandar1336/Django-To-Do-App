@@ -88,6 +88,11 @@ Run the following command to set up your database:
 ```bash
 python manage.py migrate
 ```
+### BEFORE STARTING - Create .env file in root of project and apply those variables:
+
+DEBUG=False or True
+SECRET_KEY="Your Secret Key Of Django App"
+DATABASE_URL=sqlite:///db.sqlite3
 
 ### 8. Run the Development Server
 
@@ -118,3 +123,4 @@ deactivate
 ---
 
 Feel free to modify any sections as necessary! Would you like help with anything else?
+
