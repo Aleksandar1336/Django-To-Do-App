@@ -67,12 +67,11 @@ def task_list(request):
     tasks = Task.objects.filter(user=request.user).order_by("-id")
     form = TaskForm()
 
-    # Handle adding a new task
     if request.method == "POST":
         form = TaskForm(request.POST)
         if form.is_valid():
             task = form.save(commit=False)
-            task.user = request.user
+            task.user = request.user  # Assign the logged-in user
             task.save()
             return redirect("task_list")
 
