@@ -6,10 +6,6 @@ from django.contrib.auth import login
 
 
 def signup(request):
-    # Redirect authenticated users away from signup page
-    if request.user.is_authenticated:
-        return redirect("task_list")
-
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -18,14 +14,11 @@ def signup(request):
             return redirect("task_list")
     else:
         form = UserCreationForm()
-
     return render(request, "registration/signup.html", {"form": form})
 
 
-@login_required
-def task_list(request):
-    tasks = Task.objects.filter(user=request.user)
-    return render(request, "task_list.html", {"tasks": tasks})
+def home(request):
+    return render(request, "home.html")
 
 
 @login_required
@@ -58,8 +51,44 @@ def edit_task(request, pk):
 
 @login_required
 def delete_task(request, pk):
-    task = get_object_or_404(Task, pk=pk, user=request.user)
+    task = Task.objects.get(pk=pk, user=request.user)
+    task.delete()
+    return redirect("task_list")
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Task
+from .forms import TaskForm
+
+
+@login_required
+def task_list(request):
+    tasks = Task.objects.filter(user=request.user).order_by("-id")
+    form = TaskForm()
+
+    # Handle adding a new task
     if request.method == "POST":
-        task.delete()
-        return redirect("task_list")
-    return render(request, "delete_task.html", {"task": task})
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.user = request.user
+            task.save()
+            return redirect("task_list")
+
+    return render(request, "task_list.html", {"tasks": tasks, "form": form})
+
+
+@login_required
+def toggle_task(request, pk):
+    task = get_object_or_404(Task, pk=pk, user=request.user)
+    task.completed = not task.completed
+    task.save()
+    return redirect("task_list")
+
+
+@login_required
+def delete_task(request, pk):
+    task = get_object_or_404(Task, pk=pk, user=request.user)
+    task.delete()
+    return redirect("task_list")

@@ -1,21 +1,30 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}My To-Do List{% endblock %}
 {% block content %}
-    <h1>To-Do List</h1>
-    <a href="{% url 'add_task' %}">Add New Task</a>
-    <ul>
-        {% for task in tasks %}
-            <li>
-                <a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a>
-                -
-                {% if task.completed %}
-                    Done
-                {% else %}
-                    Pending
-                {% endif %}
-            </li>
-        {% empty %}
-            <li>No tasks yet!</li>
-        {% endfor %}
-    </ul>
+    <div class="todo-app">
+        <h2>
+            To-Do List
+            <img src="{% static 'images/icon.png' %}">
+        </h2>
+        <form method="POST" class="row">
+            {% csrf_token %}
+            {{ form.title }}
+            <button type="submit">Add</button>
+        </form>
+        <ul id="list-container">
+            {% for task in tasks %}
+                <li class="{% if task.completed %}checked{% endif %}">
+                    <!-- Circle link -->
+                    <a href="{% url 'toggle_task' task.pk %}" class="tick-circle"></a>
+                    <!-- Task text -->
+                    <span class="task-text">{{ task.title }}</span>
+                    <!-- Delete button -->
+                    <span class="delete"><a href="{% url 'delete_task' task.pk %}">&times;</a></span>
+                </li>
+            {% empty %}
+                <li>No tasks yet!</li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}

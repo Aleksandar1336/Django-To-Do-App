@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Welcome{% endblock %}
+{% block content %}
+    <h1>Welcome to the To-Do App!</h1>
+    <p>This is a starter page visible to everyone.</p>
+    {% if user.is_authenticated %}
+        <p>
+            Go to your <a href="{% url 'task_list' %}">To-Do List</a>.
+        </p>
+    {% else %}
+        <p>
+            <a href="{% url 'login' %}">Login</a> or <a href="{% url 'signup' %}">Sign Up</a> to start managing your tasks.
+        </p>
+    {% endif %}
+{% endblock %}
