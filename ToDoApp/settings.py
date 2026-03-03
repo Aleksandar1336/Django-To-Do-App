@@ -140,6 +140,5 @@ LOGOUT_REDIRECT_URL = "/"
 COMPRESS_ROOT = BASE_DIR / "static"
 COMPRESS_ENABLED = True
 STATICFILES_FINDERS = ("compressor.finders.CompressorFinder",)
-DEBUG = False
 
 CSRF_TRUSTED_ORIGINS = ["https://*.herokuapp.com"]  # new
