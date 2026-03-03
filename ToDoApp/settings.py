@@ -137,3 +137,16 @@ LOGIN_REDIRECT_URL = "/tasks/"
 LOGOUT_REDIRECT_URL = "/"
 
 CSRF_TRUSTED_ORIGINS = ["https://*.herokuapp.com"]  # new
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+if DEBUG:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": "ERROR"},
+}
