@@ -1,0 +1,6 @@
+<h1>{{ task.title }}</h1>
+<p>{{ task.description }}</p>
+<p>Status: {% if task.completed %}Completed{% else %}Pending{% endif %}</p>
+<a href="{% url 'edit_task' task.pk %}">Edit</a> |
+<a href="{% url 'delete_task' task.pk %}">Delete</a> |
+<a href="{% url 'task_list' %}">Back to list</a>
