@@ -1,52 +1,50 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}My To-Do List{% endblock %}
-
 {% block content %}
-<div class="todo-app">
-    <h2>
-        To-Do List
-        <img src="{% static 'images/icon.png' %}">
-    </h2>
-
-    <!-- Add new task form -->
-    <form method="POST" class="row">
-        {% csrf_token %}
-        {{ form.title }}
-        <button type="submit">Add</button>
-    </form>
-
-    <!-- Tasks list -->
-    <ul id="list-container">
-        {% for task in tasks %}
-            <li class="{% if task.completed %}checked{% endif %}">
-                <!-- Toggle completion -->
-                <a href="{% url 'toggle_task' task.pk %}" class="tick-circle"></a>
-
-                <!-- Task title linking to detail/edit page -->
-                <a href="{% url 'task_detail' task.pk %}" class="task-text">{{ task.title }}</a>
-
-                <!-- Edit link -->
-                <a href="{% url 'edit_task' task.pk %}" class="edit">✎</a>
-
-                <!-- Delete button -->
-                <a href="{% url 'delete_task' task.pk %}" class="delete">&times;</a>
-            </li>
-        {% empty %}
-            <li>No tasks yet!</li>
-        {% endfor %}
-    </ul>
-</div>
-
-<style>
-/* Simple styling for clarity */
+    <div class="todo-app">
+        <h2>
+            To-Do List
+            <img src="{% static 'images/icon.png' %}" alt="To-Do Icon">
+        </h2>
+        <!-- Add new task form -->
+        <form method="POST" class="row">
+            {% csrf_token %}
+            <!-- Display field errors if any -->
+            {% if form.title.errors %}<div class="error">{{ form.title.errors }}</div>{% endif %}
+            {{ form.title }}
+            {% if form.description.errors %}<div class="error">{{ form.description.errors }}</div>{% endif %}
+            {{ form.description }}
+            <button type="submit">Add</button>
+        </form>
+        <!-- Tasks list -->
+        <ul id="list-container">
+            {% for task in tasks %}
+                <li class="{% if task.completed %}checked{% endif %}">
+                    <!-- Toggle completion -->
+                    <a href="{% url 'toggle_task' task.pk %}" class="tick-circle"></a>
+                    <!-- Task title linking to detail/edit page -->
+                    <a href="{% url 'task_detail' task.pk %}" class="task-text">{{ task.title }}</a>
+                    <!-- Edit link -->
+                    <a href="{% url 'edit_task' task.pk %}" class="edit">✎</a>
+                    <!-- Delete button -->
+                    <a href="{% url 'delete_task' task.pk %}" class="delete">&times;</a>
+                </li>
+            {% empty %}
+                <li>No tasks yet!</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <style>
 .todo-app { max-width: 500px; margin: auto; }
-.row { display: flex; gap: 10px; margin-bottom: 10px; }
+.row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.row button { align-self: flex-start; }
 ul#list-container { list-style: none; padding: 0; }
 ul#list-container li { display: flex; align-items: center; gap: 10px; padding: 5px 0; }
 ul#list-container li.checked .task-text { text-decoration: line-through; color: gray; }
 .tick-circle { width: 16px; height: 16px; border: 1px solid #000; border-radius: 50%; display: inline-block; }
 .edit { color: blue; text-decoration: none; }
 .delete { color: red; text-decoration: none; }
-</style>
+.error { color: red; font-size: 0.9em; }
+    </style>
 {% endblock %}
