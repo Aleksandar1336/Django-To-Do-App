@@ -3,10 +3,7 @@
 {% block title %}My To-Do List{% endblock %}
 {% block content %}
     <div class="todo-app">
-        <h2>
-            To-Do List
-            <img src="{% static 'images/icon.png' %}" alt="To-Do Icon">
-        </h2>
+        <h2>To-Do List</h2>
         <!-- Add new task form -->
         <form method="POST" class="row">
             {% csrf_token %}

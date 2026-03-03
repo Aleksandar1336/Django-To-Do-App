@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     "tasks",
     "crispy_forms",
     "crispy_bootstrap5",
-    "compressor",  # new
 ]
 
 MIDDLEWARE = [
@@ -136,9 +135,5 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 LOGIN_REDIRECT_URL = "/tasks/"
 LOGOUT_REDIRECT_URL = "/"
-
-COMPRESS_ROOT = BASE_DIR / "static"
-COMPRESS_ENABLED = True
-STATICFILES_FINDERS = ("compressor.finders.CompressorFinder",)
 
 CSRF_TRUSTED_ORIGINS = ["https://*.herokuapp.com"]  # new
