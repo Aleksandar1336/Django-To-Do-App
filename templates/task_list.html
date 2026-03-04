@@ -19,7 +19,12 @@
             {% for task in tasks %}
                 <li class="{% if task.completed %}checked{% endif %}">
                     <!-- Toggle completion -->
-                    <a href="{% url 'toggle_task' task.pk %}" class="tick-circle"></a>
+                    <form method="POST"
+                          action="{% url 'toggle_task' task.pk %}"
+                          style="display:inline">
+                        {% csrf_token %}
+                        <button type="submit" class="tick-circle"></button>
+                    </form>
                     <!-- Task title linking to detail/edit page -->
                     <a href="{% url 'task_detail' task.pk %}" class="task-text">{{ task.title }}</a>
                     <!-- Edit link -->
@@ -43,5 +48,53 @@ ul#list-container li.checked .task-text { text-decoration: line-through; color: 
 .edit { color: blue; text-decoration: none; }
 .delete { color: red; text-decoration: none; }
 .error { color: red; font-size: 0.9em; }
+    </style>
+    <style>
+        /* Smooth transitions */
+.tick-circle,
+.edit,
+.delete,
+.task-text {
+    transition: all 0.2s ease;
+}
+
+/* Toggle circle hover */
+.tick-circle:hover {
+    background-color: #000;
+    transform: scale(1.1);
+}
+
+/* If already completed */
+.checked .tick-circle {
+    background: #000;
+}
+
+.checked .tick-circle:hover {
+    background: #333;
+}
+
+/* Task text hover */
+.task-text:hover {
+    color: #007bff;
+}
+
+/* Edit hover */
+.edit:hover {
+    color: darkblue;
+    transform: scale(1.1);
+}
+
+/* Delete hover */
+.delete:hover {
+    color: darkred;
+    transform: scale(1.1);
+}
+
+/* Make cursor pointer */
+.tick-circle,
+.edit,
+.delete {
+    cursor: pointer;
+}
     </style>
 {% endblock %}

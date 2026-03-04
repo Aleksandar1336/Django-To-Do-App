@@ -1,93 +1,139 @@
+# tasks/views.py
+
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Task
-from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
+from django.views import View
+from django.views.generic import (
+    TemplateView,
+    ListView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+    DetailView,
+)
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
+from .models import Task
+from .forms import TaskForm
 
 
-def signup(request):
-    if request.method == "POST":
+# ------------------------
+# Home View
+# ------------------------
+class HomeView(TemplateView):
+    template_name = "home.html"
+
+
+# ------------------------
+# Signup View
+# ------------------------
+class SignUpView(View):
+    def get(self, request):
+        form = UserCreationForm()
+        return render(request, "registration/signup.html", {"form": form})
+
+    def post(self, request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect("task_list")
-    else:
-        form = UserCreationForm()
-    return render(request, "registration/signup.html", {"form": form})
+        return render(request, "registration/signup.html", {"form": form})
 
 
-def home(request):
-    return render(request, "home.html")
+# ------------------------
+# Task List + Create (Combined)
+# ------------------------
+class TaskListView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = "task_list.html"
+    context_object_name = "tasks"
+    login_url = "login"
 
+    def get_queryset(self):
+        return Task.objects.filter(user=self.request.user).order_by("-id")
 
-@login_required
-def add_task(request):
-    if request.method == "POST":
-        title = request.POST.get("title")
-        description = request.POST.get("description")
-        Task.objects.create(title=title, description=description, user=request.user)
-        return redirect("task_list")
-    return render(request, "add_task.html")
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = TaskForm()
+        return context
 
-
-@login_required
-def task_detail(request, pk):
-    task = get_object_or_404(Task, pk=pk, user=request.user)
-    return render(request, "task_detail.html", {"task": task})
-
-
-@login_required
-def edit_task(request, pk):
-    task = get_object_or_404(Task, pk=pk, user=request.user)
-    if request.method == "POST":
-        task.title = request.POST.get("title")
-        task.description = request.POST.get("description")
-        task.completed = "completed" in request.POST
-        task.save()
-        return redirect("task_list")
-    return render(request, "edit_task.html", {"task": task})
-
-
-@login_required
-def delete_task(request, pk):
-    task = Task.objects.get(pk=pk, user=request.user)
-    task.delete()
-    return redirect("task_list")
-
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from .models import Task
-from .forms import TaskForm
-
-
-@login_required
-def task_list(request):
-    tasks = Task.objects.filter(user=request.user).order_by("-id")
-    form = TaskForm()
-
-    if request.method == "POST":
+    def post(self, request, *args, **kwargs):
         form = TaskForm(request.POST)
         if form.is_valid():
             task = form.save(commit=False)
-            task.user = request.user  # Assign the logged-in user
+            task.user = request.user
             task.save()
-            return redirect("task_list")
-
-    return render(request, "task_list.html", {"tasks": tasks, "form": form})
+        return redirect("task_list")
 
 
-@login_required
-def toggle_task(request, pk):
-    task = get_object_or_404(Task, pk=pk, user=request.user)
-    task.completed = not task.completed
-    task.save()
-    return redirect("task_list")
+# ------------------------
+# Separate Create View (Optional)
+# ------------------------
+class TaskCreateView(LoginRequiredMixin, CreateView):
+    model = Task
+    form_class = TaskForm
+    template_name = "add_task.html"
+    success_url = reverse_lazy("task_list")
+    login_url = "login"
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 
-@login_required
-def delete_task(request, pk):
-    task = get_object_or_404(Task, pk=pk, user=request.user)
-    task.delete()
-    return redirect("task_list")
+# ------------------------
+# Task Detail
+# ------------------------
+class TaskDetailView(LoginRequiredMixin, DetailView):
+    model = Task
+    template_name = "task_detail.html"
+    context_object_name = "task"
+    login_url = "login"
+
+    def get_queryset(self):
+        return Task.objects.filter(user=self.request.user)
+
+
+# ------------------------
+# Task Update
+# ------------------------
+class TaskUpdateView(LoginRequiredMixin, UpdateView):
+    model = Task
+    fields = ["title", "description", "completed"]
+    template_name = "edit_task.html"
+    success_url = reverse_lazy("task_list")
+    login_url = "login"
+
+    def get_queryset(self):
+        return Task.objects.filter(user=self.request.user)
+
+
+# ------------------------
+# Task Delete
+# ------------------------
+class TaskDeleteView(LoginRequiredMixin, DeleteView):
+    model = Task
+    success_url = reverse_lazy("task_list")
+    login_url = "login"
+
+    def get_queryset(self):
+        return Task.objects.filter(user=self.request.user)
+
+    # If you don't want confirmation page
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+
+# ------------------------
+# Toggle Task
+# ------------------------
+class ToggleTaskView(LoginRequiredMixin, View):
+    login_url = "login"
+
+    def post(self, request, pk):
+        task = get_object_or_404(Task, pk=pk, user=request.user)
+        task.completed = not task.completed
+        task.save()
+        return redirect("task_list")

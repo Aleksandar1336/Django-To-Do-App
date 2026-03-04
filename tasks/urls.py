@@ -1,14 +1,24 @@
+# tasks/urls.py
+
 from django.urls import path
-from . import views
+from .views import (
+    HomeView,
+    SignUpView,
+    TaskListView,
+    TaskCreateView,
+    TaskDetailView,
+    TaskUpdateView,
+    TaskDeleteView,
+    ToggleTaskView,
+)
 
 urlpatterns = [
-    path("", views.home, name="home"),
-    path("tasks/", views.task_list, name="task_list"),
-    path("tasks/add/", views.add_task, name="add_task"),
-    path("tasks/<int:pk>/", views.task_detail, name="task_detail"),
-    path("tasks/<int:pk>/edit/", views.edit_task, name="edit_task"),
-    path("tasks/<int:pk>/delete/", views.delete_task, name="delete_task"),
-    path("toggle/<int:pk>/", views.toggle_task, name="toggle_task"),
-    # Signup
-    path("signup/", views.signup, name="signup"),
+    path("", HomeView.as_view(), name="home"),
+    path("signup/", SignUpView.as_view(), name="signup"),
+    path("tasks/", TaskListView.as_view(), name="task_list"),
+    path("tasks/add/", TaskCreateView.as_view(), name="add_task"),
+    path("tasks/<int:pk>/", TaskDetailView.as_view(), name="task_detail"),
+    path("tasks/<int:pk>/edit/", TaskUpdateView.as_view(), name="edit_task"),
+    path("tasks/<int:pk>/delete/", TaskDeleteView.as_view(), name="delete_task"),
+    path("toggle/<int:pk>/", ToggleTaskView.as_view(), name="toggle_task"),
 ]
