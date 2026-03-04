@@ -120,8 +120,6 @@ When you're done, you can deactivate the virtual environment by running:
 deactivate
 ```
 
----
-
-Feel free to modify any sections as necessary! Would you like help with anything else?
+---
 
 
